@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>YETI - Clinical Emergency Monitor</title>
+
+<style>
+:root{
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #0f172a;
+  --bg-card: rgba(15, 23, 42, 0.6);
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-cyan: #06b6d4;
+  --accent-blue: #3b82f6;
+  --success: #10b981;
+  --success-glow: rgba(16, 185, 129, 0.3);
+  --alert: #f59e0b;
+  --danger: #ef4444;
+  --danger-glow: rgba(239, 68, 68, 0.3);
+  --border: rgba(148, 163, 184, 0.1);
+  --border-light: rgba(148, 163, 184, 0.05);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
+  --shadow-glow: 0 0 24px rgba(6, 182, 212, 0.15);
+}
+
+/* RESET & BASE */
+*, *::before, *::after {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0a0e1a 0%, #1a1f3a 50%, #0a0e1a 100%);
+  background-attachment: fixed;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  color: var(--text-primary);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ANIMATED BACKGROUND */
+body::before {
+  content: '';
+  position: fixed;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle at 20% 50%, rgba(6, 182, 212, 0.08) 0%, transparent 50%),
+              radial-gradient(circle at 80% 80%, rgba(59, 130, 246, 0.06) 0%, transparent 50%);
+  animation: backgroundPulse 20s ease-in-out infinite;
+  pointer-events: none;
+  z-index: 0;
+}
+
+@keyframes backgroundPulse {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-5%, -5%) scale(1.05); }
+}
+
+/* APP CONTAINER */
+.app {
+  position: relative;
+  z-index: 1;
+  max-width: 428px;
+  margin: 0 auto;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(20px);
+}
+
+/* HEADER */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  padding: 20px 20px 24px;
+  background: rgba(10, 14, 26, 0.85);
+  backdrop-filter: blur(20px) saturate(180%);
+  border-bottom: 1px solid var(--border);
+  box-shadow: var(--shadow-md);
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.header-icon {
+  width: 44px;
+  height: 44px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  box-shadow: var(--shadow-glow);
+}
+
+header h1 {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text-primary), var(--accent-cyan));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+header p {
+  margin: 0;
+  padding-left: 56px;
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* MAIN CONTENT */
+main {
+  flex: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 80px;
+}
+
+/* CARD SYSTEM */
+.card {
+  background: var(--bg-card);
+  backdrop-filter: blur(10px);
+  border-radius: 20px;
+  padding: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card:hover {
+  border-color: var(--border-light);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* PROFILE CARD */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(6, 182, 212, 0.08), rgba(59, 130, 246, 0.06));
+}
+
+.profile-avatar {
+  position: relative;
+}
+
+.profile-avatar img {
+  width: 64px;
+  height: 64px;
+  border-radius: 18px;
+  object-fit: cover;
+  border: 2px solid var(--accent-cyan);
+  box-shadow: 0 0 16px rgba(6, 182, 212, 0.3);
+}
+
+.profile-status {
+  position: absolute;
+  bottom: 2px;
+  right: 2px;
+  width: 14px;
+  height: 14px;
+  background: var(--success);
+  border: 2px solid var(--bg-primary);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--success-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.profile-info h2 {
+  margin: 0 0 4px 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.profile-info span {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+/* TABS */
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding: 4px;
+  background: var(--bg-secondary);
+  border-radius: 14px;
+  border: 1px solid var(--border);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  background: transparent;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.tab-btn.active {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: white;
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+}
+
+/* STATUS DISPLAY */
+.status-container {
+  text-align: center;
+  padding: 24px 20px;
+  background: rgba(15, 23, 42, 0.4);
+  border-radius: 16px;
+  border: 1px solid var(--border-light);
+  margin-bottom: 20px;
+}
+
+.status-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.status {
+  font-size: 3rem;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  margin: 12px 0;
+  text-shadow: 0 0 20px currentColor;
+  animation: statusAppear 0.5s ease;
+}
+
+@keyframes statusAppear {
+  from { opacity: 0; transform: scale(0.9); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.status.normal {
+  color: var(--success);
+  text-shadow: 0 0 20px var(--success-glow);
+}
+
+.status.alert {
+  color: var(--danger);
+  text-shadow: 0 0 20px var(--danger-glow);
+  animation: alertPulse 1s ease-in-out infinite;
+}
+
+@keyframes alertPulse {
+  0%, 100% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+}
+
+/* PROGRESS BAR */
+.bar-container {
+  position: relative;
+  height: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+
+.bar {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--success), #34d399);
+  box-shadow: 0 0 12px var(--success-glow);
+  transition: all 0.5s ease;
+  animation: barGlow 2s ease-in-out infinite;
+}
+
+.bar.alert {
+  background: linear-gradient(90deg, var(--alert), var(--danger));
+  box-shadow: 0 0 12px var(--danger-glow);
+}
+
+@keyframes barGlow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* STATS CARD */
+.stats-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08), rgba(245, 158, 11, 0.06));
+  border-radius: 16px;
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  margin-bottom: 20px;
+}
+
+.stats-card small {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.stats-card strong {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--danger), var(--alert));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* TABLE */
+.table-section {
+  margin-top: 24px;
+}
+
+.table-header {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-muted);
+  margin-bottom: 12px;
+  font-weight: 600;
+}
+
+.table-wrap {
+  max-height: 280px;
+  overflow-y: auto;
+  border-radius: 14px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.4);
+}
+
+.table-wrap::-webkit-scrollbar {
+  width: 6px;
+}
+
+.table-wrap::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.table-wrap::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 3px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+}
+
+th {
+  position: sticky;
+  top: 0;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  font-weight: 600;
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  border-bottom: 1px solid var(--border);
+  z-index: 10;
+}
+
+td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border-light);
+  color: var(--text-primary);
+}
+
+tbody tr {
+  transition: background 0.2s ease;
+}
+
+tbody tr:hover {
+  background: rgba(148, 163, 184, 0.05);
+}
+
+.table-empty {
+  text-align: center;
+  padding: 32px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* DOWNLOAD BUTTON */
+.download-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: white;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 6px rgba(6, 182, 212, 0.3);
+  white-space: nowrap;
+}
+
+.download-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.4);
+}
+
+.download-btn:active {
+  transform: translateY(0);
+}
+
+/* FORM ELEMENTS */
+label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin: 16px 0 8px 0;
+  letter-spacing: 0.02em;
+}
+
+input, select {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(15, 23, 42, 0.6);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  font-family: inherit;
+}
+
+input:focus, select:focus {
+  outline: none;
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(6, 182, 212, 0.1);
+  background: rgba(15, 23, 42, 0.8);
+}
+
+input::placeholder {
+  color: var(--text-muted);
+}
+
+select {
+  cursor: pointer;
+}
+
+input[type="file"] {
+  padding: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+input[type="file"]::file-selector-button {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  cursor: pointer;
+  margin-right: 12px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  transition: all 0.3s ease;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: rgba(148, 163, 184, 0.2);
+  color: var(--text-primary);
+}
+
+/* BUTTONS */
+.btn {
+  width: 100%;
+  padding: 16px 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-blue));
+  color: white;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(6, 182, 212, 0.3);
+  margin-top: 16px;
+  position: relative;
+  overflow: hidden;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(6, 182, 212, 0.4);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* STATUS MESSAGE */
+.status-message {
+  margin-top: 16px;
+  padding: 12px 16px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  display: none;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.status-message.success {
+  display: block;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: var(--success);
+}
+
+.status-message.error {
+  display: block;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: var(--danger);
+}
+
+.status-message.warning {
+  display: block;
+  background: rgba(245, 158, 11, 0.1);
+  border: 1px solid rgba(245, 158, 11, 0.3);
+  color: var(--alert);
+}
+
+/* SERVER CONNECTION CARD */
+.server-card {
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.08), rgba(6, 182, 212, 0.06));
+  border: 1px solid rgba(59, 130, 246, 0.2);
+}
+
+.server-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.server-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--success);
+  box-shadow: 0 0 8px var(--success-glow);
+  animation: pulse 2s ease-in-out infinite;
+}
+
+.server-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+/* FOOTER */
+footer {
+  padding: 24px 20px;
+  text-align: center;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  border-top: 1px solid var(--border);
+  background: rgba(10, 14, 26, 0.6);
+  backdrop-filter: blur(10px);
+}
+
+/* TAB CONTENT */
+.tab-content {
+  display: none;
+  animation: fadeIn 0.4s ease;
+}
+
+.tab-content.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* RESPONSIVE TWEAKS */
+@media (max-width: 375px) {
+  .status { font-size: 2.5rem; }
+  .stats-card strong { font-size: 2rem; }
+  header h1 { font-size: 1.2rem; }
+}
+
+@media (min-width: 429px) {
+  .app {
+    box-shadow: 0 0 60px rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* LOADING ANIMATION */
+@keyframes shimmer {
+  0% { background-position: -1000px 0; }
+  100% { background-position: 1000px 0; }
+}
+
+.loading {
+  background: linear-gradient(90deg, transparent, rgba(148, 163, 184, 0.1), transparent);
+  background-size: 1000px 100%;
+  animation: shimmer 2s infinite;
+}
+
+</style>
+</head>
+
+<body>
+<div class="app">
+
+<header>
+  <div class="header-content">
+    <div class="header-icon">
+      <img src="https://i.ibb.co/wrjhKpkj/Whisk-305e373bf7cb589af2c4e35fc11b391ddr.png" alt="YETI" style="width: 100%; height: 100%; object-fit: cover; border-radius: 12px;">
+    </div>
+    <h1>YETI</h1>
+  </div>
+  <p>Your Empathetic Treatment Intelligence</p>
+</header>
+
+<main>
+
+        <!-- LIVE VIDEO SECTION -->
+      <div class="table-section" style="margin-top: 28px;">
+        <div class="table-header">Live Camera Feed</div>
+
+        <button class="btn" id="videoToggleBtn" onclick="toggleVideo()" style="margin-bottom:16px;">
+          🎥 Start Live Video
+        </button>
+
+        <div id="videoContainer" style="display:none; text-align:center;">
+          <img id="liveVideo"
+               style="width:100%; border-radius:16px; border:1px solid var(--border); box-shadow: var(--shadow-md);" />
+        </div>
+      </div>
+
+  <!-- PROFILE CARD -->
+  <div class="card profile">
+    <div class="profile-avatar">
+      <img src="https://i.ibb.co/wrFgZbJ9/Whisk-3ccfdd6f848f120b87f4247827aa1fbddr.png" alt="Profile">
+      <div class="profile-status"></div>
+    </div>
+    <div class="profile-info">
+      <h2>Parth Mahato</h2>
+      <span>System Operator</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT CARD -->
+  <div class="card">
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('monitor')">
+        Monitor
+      </button>
+      <button class="tab-btn" onclick="showTab('upload')">
+        Upload
+      </button>
+      <button class="tab-btn" onclick="showTab('files')">
+        Files
+      </button>
+    </div>
+
+    <!-- MONITOR TAB -->
+    <div id="tabMonitor" class="tab-content active">
+      <div class="status-container">
+        <div class="status-label">Patient Condition</div>
+        <div id="statusText" class="status normal">NORMAL</div>
+        <div class="bar-container">
+          <div id="statusBar" class="bar"></div>
+        </div>
+      </div>
+
+      <div class="stats-card">
+        <small>Emergency Alerts Triggered</small>
+        <strong id="emergencyCount">0</strong>
+      </div>
+
+      <div class="table-section">
+        <div class="table-header">Recent Symptoms</div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Time</th>
+                <th>Symptom</th>
+              </tr>
+            </thead>
+            <tbody id="symptomTable">
+              <tr><td colspan="2" class="table-empty">Loading data...</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- UPLOAD TAB -->
+    <div id="tabUpload" class="tab-content">
+      <label>Search Patient</label>
+      <input type="text" id="patientSearch" placeholder="Type patient name...">
+      
+      <label>Select Patient</label>
+      <select id="reportPatientSelect" size="5"></select>
+
+      <label>Report Name</label>
+      <input type="text" id="reportName" placeholder="e.g., Blood Test Report">
+
+      <label>Upload File</label>
+      <input type="file" id="reportFile" accept=".pdf,.doc,.docx,.jpg,.png">
+
+      <button class="btn" onclick="submitReport()">Submit Report</button>
+      <div id="reportStatus" class="status-message"></div>
+    </div>
+
+    <!-- FILES TAB -->
+    <div id="tabFiles" class="tab-content">
+      <label>Search Patient</label>
+      <input type="text" id="filesPatientSearch" placeholder="Type patient name...">
+      
+      <label>Select Patient</label>
+      <select id="filesPatientSelect" size="5" onchange="loadPatientFiles()"></select>
+
+      <div class="table-section" style="margin-top: 24px;">
+        <div class="table-header">
+          <span id="selectedPatientName">Patient Files</span>
+        </div>
+        <div class="table-wrap" style="max-height: 320px;">
+          <table>
+            <thead>
+              <tr>
+                <th>Report Name</th>
+                <th>Date</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="filesTable">
+              <tr><td colspan="3" class="table-empty">Select a patient to view files</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SERVER CONNECTION CARD -->
+  <div class="card server-card">
+    <div class="server-status">
+      <div class="server-indicator"></div>
+      <div class="server-label">Monitoring Server</div>
+    </div>
+    <input id="ipInput" value="172.19.5.40:5001" placeholder="IP:PORT">
+    <button class="btn" onclick="setIP()">Connect Server</button>
+  </div>
+
+
+</main>
+
+<footer>
+  Hospital-Grade AI Safety System
+  <br>
+  <span style="opacity: 0.6;">© 2026 Clinical Monitor</span>
+</footer>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+/* ================= CONFIG ================= */
+let serverAddress = "10.142.55.40:5001";
+let lastState = "normal";
+let emergencyCount = 0;
+
+/* ================= ALERT AUDIO ================= */
+const alertAudio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBSuBzvLZiTYIGGe47OehURMNUKvj6axeHAU8ldPty3QtBSp+zPLaizsKG2S66+miUBMPU63k6K1dGwc9mNTty3YtByt/zfHYijoKGmO76+mjTxIOUKzk6KxbGgg+mtXty3YtBSp+zPHaijoKGmO76+mjTxIOUKvk6KxbGgg+mtXty3YtBSp+zPHYizoKGWS76+mjUBMOUKzk6KxcGwc9mdTty3YtBSp/zfHYizoKGWS76+mjUBIOUKvk6KtdGwc+mNTty3ctBSt+zfHYizoKGWS76+mjUBIOUKzk6KtdGwc+mNTty3ctBSt+zfHYijoKGmO76+mjTxIOUKzk6KxbGgg+mtXty3ctBSp+zPHYizoKGmS76+mjTxIPUazk6KxcGwc9mdTuy3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizoKGWO66+mjUBIPUqzk6KxcGwc9mdTty3YtBSp/zPHYizo=');
+
+/* ================= SET IP ================= */
+function setIP(){
+  serverAddress = document.getElementById("ipInput").value.trim();
+  console.log("Server set to:", serverAddress);
+  showToast("Server connected: " + serverAddress, "success");
+}
+
+/* ================= VIBRATE & SOUND ================= */
+function triggerAlertNotification(){
+  if(navigator.vibrate){
+    navigator.vibrate([200, 100, 200, 100, 200]);
+  }
+  alertAudio.play().catch(e => console.log("Audio play failed:", e));
+}
+
+/* ================= TOAST NOTIFICATION ================= */
+function showToast(message, type = 'success') {
+  const statusEl = document.getElementById('reportStatus');
+  statusEl.textContent = message;
+  statusEl.className = 'status-message ' + type;
+  setTimeout(() => {
+    statusEl.className = 'status-message';
+  }, 5000);
+}
+
+/* ================= STATUS UPDATE ================= */
+async function updateStatus(){
+  try{
+    const res = await fetch(`http://${serverAddress}/status`);
+    const data = await res.json();
+
+    const text = document.getElementById("statusText");
+    const bar = document.getElementById("statusBar");
+    const count = document.getElementById("emergencyCount");
+
+    if(data.state === "alert"){
+      text.textContent = "ALERT";
+      text.className = "status alert";
+      bar.className = "bar alert";
+
+      if(lastState !== "alert"){
+        emergencyCount++;
+        count.textContent = emergencyCount;
+        triggerAlertNotification();
+      }
+      lastState = "alert";
+    } 
+    else {
+      text.textContent = "NORMAL";
+      text.className = "status normal";
+      bar.className = "bar";
+      lastState = "normal";
+    }
+
+  } catch(e){
+    console.error("Fetch failed:", e);
+  }
+}
+
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = "https://jclnnbllracsxhbukxhy.supabase.co";
+const SUPABASE_KEY = "sb_publishable_FKVTJrNZeY0Vz6tVaUWNQA_v9wXRADk";
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+async function loadSymptoms(){
+  const { data, error } = await supabaseClient
+    .from("symptoms_log")
+    .select("time, symptom")
+    .order("time", { ascending:false })
+    .limit(20);
+
+  const tbody = document.getElementById("symptomTable");
+  tbody.innerHTML = "";
+
+  if(error){
+    tbody.innerHTML = `<tr><td colspan="2" class="table-empty">Error loading data</td></tr>`;
+    return;
+  }
+
+  if(!data.length){
+    tbody.innerHTML = `<tr><td colspan="2" class="table-empty">No symptoms recorded</td></tr>`;
+    return;
+  }
+
+  data.forEach(row=>{
+    const tr = document.createElement('tr');
+    const time = new Date(row.time).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    tr.innerHTML = `
+      <td>${time}</td>
+      <td>${row.symptom}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================= TAB SWITCH ================= */
+function showTab(tab){
+  // Update tab buttons
+  const buttons = document.querySelectorAll('.tab-btn');
+  buttons.forEach(btn => {
+    const btnText = btn.textContent.trim().toLowerCase();
+    if(btnText === tab || btnText.includes(tab)){
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
+
+  // Update tab content
+  document.getElementById("tabMonitor").classList.toggle('active', tab === 'monitor');
+  document.getElementById("tabUpload").classList.toggle('active', tab === 'upload');
+  document.getElementById("tabFiles").classList.toggle('active', tab === 'files');
+  
+  // Load patients for Files tab when opened
+  if(tab === 'files'){
+    loadFilesPatients();
+  }
+}
+
+/* ================= REPORT SUBMISSION ================= */
+const reportPatientSelect = document.getElementById("reportPatientSelect");
+let allPatients = [];
+
+async function loadReportPatients() {
+  const { data, error } = await supabaseClient.from("patients").select("id,name").order("name");
+  if(error){
+    reportPatientSelect.innerHTML = `<option value="">Error loading patients</option>`;
+    return;
+  }
+  allPatients = data || [];
+  displayPatients(allPatients);
+}
+loadReportPatients();
+
+function displayPatients(patients){
+  reportPatientSelect.innerHTML = "";
+  if(patients.length === 0){
+    reportPatientSelect.innerHTML = `<option value="">No patients found</option>`;
+    return;
+  }
+  patients.forEach(p => {
+    const option = document.createElement("option");
+    option.value = p.id;
+    option.text = p.name;
+    reportPatientSelect.appendChild(option);
+  });
+}
+
+/* ================= SEARCH PATIENT ================= */
+document.getElementById("patientSearch").addEventListener("input", (e)=>{
+  const term = e.target.value.toLowerCase();
+  const filtered = allPatients.filter(p=>p.name.toLowerCase().includes(term));
+  displayPatients(filtered);
+});
+
+/* ================= SUBMIT REPORT ================= */
+async function submitReport(){
+  const patientId = reportPatientSelect.value;
+  const reportName = document.getElementById("reportName").value.trim();
+  const file = document.getElementById("reportFile").files[0];
+
+  if(!patientId || !reportName || !file){
+    showToast("⚠️ Please fill all fields", "warning");
+    return;
+  }
+
+  showToast("Uploading report...", "success");
+
+  const filePath = `${patientId}/${Date.now()}_${file.name}`;
+
+  const { error: uploadError } = await supabaseClient
+    .storage
+    .from("medical-reports")
+    .upload(filePath, file);
+
+  if(uploadError){
+    showToast("❌ File upload failed", "error");
+    return;
+  }
+
+  const { data } = supabaseClient
+    .storage
+    .from("medical-reports")
+    .getPublicUrl(filePath);
+
+  const { error: dbError } = await supabaseClient
+    .from("medical_reports")
+    .insert([{
+      patient_id: patientId,
+      file_url: data.publicUrl,
+      file_name: reportName
+    }]);
+
+  if(dbError){
+    showToast("❌ Failed to save report", "error");
+  } else {
+    showToast("✅ Report submitted successfully", "success");
+    document.getElementById("reportName").value = "";
+    document.getElementById("reportFile").value = "";
+  }
+}
+
+/* ================= FILES TAB - PATIENT LIST ================= */
+const filesPatientSelect = document.getElementById("filesPatientSelect");
+let filesPatients = [];
+
+async function loadFilesPatients() {
+  const { data, error } = await supabaseClient.from("patients").select("id,name").order("name");
+  if(error){
+    filesPatientSelect.innerHTML = `<option value="">Error loading patients</option>`;
+    return;
+  }
+  filesPatients = data || [];
+  displayFilesPatients(filesPatients);
+}
+
+function displayFilesPatients(patients){
+  filesPatientSelect.innerHTML = "";
+  if(patients.length === 0){
+    filesPatientSelect.innerHTML = `<option value="">No patients found</option>`;
+    return;
+  }
+  patients.forEach(p => {
+    const option = document.createElement("option");
+    option.value = p.id;
+    option.text = p.name;
+    option.dataset.name = p.name;
+    filesPatientSelect.appendChild(option);
+  });
+}
+
+/* ================= FILES TAB - SEARCH PATIENT ================= */
+document.getElementById("filesPatientSearch").addEventListener("input", (e)=>{
+  const term = e.target.value.toLowerCase();
+  const filtered = filesPatients.filter(p=>p.name.toLowerCase().includes(term));
+  displayFilesPatients(filtered);
+});
+
+/* ================= FILES TAB - LOAD PATIENT FILES ================= */
+async function loadPatientFiles(){
+  const patientId = filesPatientSelect.value;
+  const patientName = filesPatientSelect.selectedOptions[0]?.dataset.name || "Patient";
+  const tbody = document.getElementById("filesTable");
+  
+  document.getElementById("selectedPatientName").textContent = `${patientName}'s Files`;
+  
+  if(!patientId){
+    tbody.innerHTML = `<tr><td colspan="3" class="table-empty">Select a patient to view files</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = `<tr><td colspan="3" class="table-empty">Loading files...</td></tr>`;
+
+  const { data, error } = await supabaseClient
+    .from("medical_reports")
+    .select("id, file_name, file_url, created_at")
+    .eq("patient_id", patientId)
+    .order("created_at", { ascending: false });
+
+  if(error){
+    tbody.innerHTML = `<tr><td colspan="3" class="table-empty">Error loading files</td></tr>`;
+    console.error("Error loading files:", error);
+    return;
+  }
+
+  if(!data.length){
+    tbody.innerHTML = `<tr><td colspan="3" class="table-empty">No files found for this patient</td></tr>`;
+    return;
+  }
+
+  tbody.innerHTML = "";
+  data.forEach(file => {
+    const tr = document.createElement('tr');
+    const date = new Date(file.created_at).toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+    
+    tr.innerHTML = `
+      <td>${file.file_name}</td>
+      <td>${date}</td>
+      <td><button class="download-btn" onclick="downloadFile('${file.file_url}', '${file.file_name}')">📥 Download</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+/* ================= DOWNLOAD FILE ================= */
+function downloadFile(url, filename){
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  a.target = '_blank';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  showToast("📥 Downloading: " + filename, "success");
+}
+
+/* ================= INTERVALS ================= */
+setInterval(updateStatus, 800);
+setInterval(loadSymptoms, 2000);
+
+/* ================= LIVE VIDEO ================= */
+let videoRunning = false;
+
+function toggleVideo(){
+  const btn = document.getElementById("videoToggleBtn");
+  const container = document.getElementById("videoContainer");
+  const video = document.getElementById("liveVideo");
+
+  if(!videoRunning){
+    video.src = `http://${serverAddress}/video_feed`;
+    container.style.display = "block";
+    btn.textContent = "🛑 Stop Live Video";
+    videoRunning = true;
+  } else {
+    video.src = "";
+    container.style.display = "none";
+    btn.textContent = "🎥 Start Live Video";
+    videoRunning = false;
+  }
+}
+
+</script>
+
+</body>
+</html>

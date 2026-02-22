@@ -1,0 +1,21 @@
+# Core AI & CV libraries
+opencv-python==4.8.1.78
+mediapipe==0.10.1
+
+# Machine Learning / LLM
+torch==2.1.0
+transformers==4.34.0
+sentence-transformers==2.2.2
+
+# Web & API
+fastapi==0.109.0
+uvicorn==0.24.0
+requests==2.32.0
+
+# Data handling
+numpy==1.26.0
+pandas==2.1.1
+
+# Optional: For nicer CLI & logging
+rich==13.5.2
+python-dotenv==1.0.0

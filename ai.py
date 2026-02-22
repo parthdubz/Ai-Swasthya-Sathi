@@ -1,28 +1,132 @@
-import sounddevice as sd
-import numpy as np
-import soundfile as sf
+# ======================= IMPORTS =======================
+import speech_recognition as sr
+import google.generativeai as genai
+import edge_tts
+import asyncio
+import os
+import threading
+from datetime import datetime
+from supabase import create_client
 
-MIC_INDEX = 9
-CHANNELS = 1
+# ======================= CONFIG =======================
+GENAI_API_KEY = "AIzaSyCTq9izH8ozVBrPuqQ8RTFnsYrMiMO5Vj4"
+GENAI_MODEL = "gemini-2.5-flash"
 
-device_info = sd.query_devices(MIC_INDEX, 'input')
-SAMPLE_RATE = int(device_info['default_samplerate'])
-print(f"Using sample rate: {SAMPLE_RATE}")
+VOICE = "ne-NP-SagarNeural"
+TTS_FILE = "reply.mp3"
 
-DURATION = 30 # seconds per chunk
-all_audio = []
+WAITING_REPLY = "ठीक छ, म केही सेकेन्डमा जवाफ दिनेछु।"
 
-def callback(indata, frames, time, status):
-    if status:
-        print(status)
-    all_audio.append(indata.copy())
+SUPABASE_URL = "https://jclnnbllracsxhbukxhy.supabase.co"
+SUPABASE_KEY = "sb_publishable_FKVTJrNZeY0Vz6tVaUWNQA_v9wXRADk"
 
-with sd.InputStream(samplerate=SAMPLE_RATE, channels=CHANNELS, device=MIC_INDEX, callback=callback):
-    sd.sleep(DURATION * 1000)  # capture for DURATION seconds
+supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Convert list of arrays to single numpy array
-audio_np = np.concatenate(all_audio, axis=0)
+# ======================= SYSTEM PROMPT =======================
+SYSTEM_PROMPT = """
+You are a healthcare awareness assistant.
+You must reply ONLY in Nepali.
+Reply in exactly four sentences:
+1) empathy
+2) what it could be
+3) simple self-care
+4) conclusion
+Do NOT diagnose diseases.
+Do NOT prescribe medicines.
+ONLY answer health-related questions.
+"""
 
-# Save as WAV
-sf.write("output.wav", audio_np, SAMPLE_RATE)
-print("Saved output.wav")
+# ======================= INIT =======================
+print("🔄 Initializing Gemini...")
+genai.configure(api_key=GENAI_API_KEY)
+model = genai.GenerativeModel(GENAI_MODEL)
+
+print("🔄 Initializing speech recognition...")
+recognizer = sr.Recognizer()
+mic = sr.Microphone()
+
+print("✅ System Ready — Press 'y' to start speaking")
+
+# ======================= TTS =======================
+async def speak_async(text):
+    communicate = edge_tts.Communicate(text=text, voice=VOICE)
+    await communicate.save(TTS_FILE)
+    os.startfile(TTS_FILE)
+
+def speak(text):
+    asyncio.run(speak_async(text))
+
+# ======================= SYMPTOM LOGGER =======================
+def log_symptom_label(user_text):
+    try:
+        prompt = f"""
+Extract ONLY ONE main health symptom from the sentence.
+Use 1 to 3 words only.
+Lowercase.
+No punctuation.
+
+Sentence:
+{user_text}
+"""
+        result = model.generate_content(prompt)
+        symptom = result.text.strip().lower()
+
+        timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+        supabase.table("symptoms_log").insert({
+            "time": timestamp,
+            "symptom": symptom,
+            "raw_speech": user_text
+        }).execute()
+
+        print("✅ Logged to Supabase:", symptom)
+
+    except Exception as e:
+        print("⚠️ Supabase logging failed:", e)
+
+# ======================= LISTEN =======================
+def listen(timeout=None):
+    with mic as source:
+        recognizer.adjust_for_ambient_noise(source, duration=0.3)
+        audio = recognizer.listen(source, timeout=timeout)
+    return recognizer.recognize_google(audio).lower()
+
+# ======================= MAIN LOOP =======================
+while True:
+    try:
+        start = input("\nPress 'y' and Enter to speak your health concern: ").strip().lower()
+        if start != 'y':
+            continue
+
+        print("🎤 Listening...")
+        user_text = listen(timeout=6)
+        print("📝 User:", user_text)
+
+        # 🔊 Instant feedback (NO LAG FEEL)
+        threading.Thread(
+            target=speak,
+            args=(WAITING_REPLY,),
+            daemon=True
+        ).start()
+
+        # 🤖 Gemini processing
+        prompt = SYSTEM_PROMPT + "\nUser:\n" + user_text
+        response = model.generate_content(prompt)
+        reply = response.text.strip()
+
+        print("🤖 AI (Nepali):", reply)
+
+        # 🗂️ Log symptom (background)
+        threading.Thread(
+            target=log_symptom_label,
+            args=(user_text,),
+            daemon=True
+        ).start()
+
+        # 🔊 Final reply
+        speak(reply)
+
+    except sr.UnknownValueError:
+        print("⚠️ Audio samajh nahi aaya, dobara try karo.")
+    except Exception as e:
+        print("❌ Error:", e)
