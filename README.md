@@ -82,6 +82,17 @@ Apprecaiton Letter from Trinity College And SS
 <br>
 
 ---
+## Hardware used in the robot
+ESP8266 <br>
+Oled Display <br>
+Speaker <br>
+Microphone <br>
+WEB Camera <br>
+Buzzer <br>
+LED <br>
+### WORKING FLOWCHART :
+<a href="https://ibb.co/chd4Cx9g"><img src="https://i.ibb.co/Wv1mPsXx/93e3e43b-5d1f-4781-a0a8-98162c3b5638.png" alt="93e3e43b-5d1f-4781-a0a8-98162c3b5638" border="0" /></a>
+___
 
 ## 🌐 Connect with Us
 <div align="center"> <a href="https://instagram.com/parth_dubz"> <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white&style=for-the-badge" alt="Instagram"/> </a> <a href="https://linkedin.com/in/parthmahato"> <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=LinkedIn&logoColor=white&style=for-the-badge" alt="LinkedIn"/> </a> </div>
