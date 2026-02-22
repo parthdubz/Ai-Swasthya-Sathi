@@ -9,7 +9,7 @@ from datetime import datetime
 from supabase import create_client
 
 # ======================= CONFIG =======================
-GENAI_API_KEY = "AIzaSyCTq9izH8ozVBrPuqQ8RTFnsYrMiMO5Vj4"
+GENAI_API_KEY = "ADD YOUR API"
 GENAI_MODEL = "gemini-2.5-flash"
 
 VOICE = "ne-NP-SagarNeural"
@@ -17,8 +17,8 @@ TTS_FILE = "reply.mp3"
 
 WAITING_REPLY = "ठीक छ, म केही सेकेन्डमा जवाफ दिनेछु।"
 
-SUPABASE_URL = "https://jclnnbllracsxhbukxhy.supabase.co"
-SUPABASE_KEY = "sb_publishable_FKVTJrNZeY0Vz6tVaUWNQA_v9wXRADk"
+SUPABASE_URL = "ADD YOUR URL"
+SUPABASE_KEY = "ADD YOUR KEY"
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 

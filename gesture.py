@@ -1,5 +1,3 @@
-# kOk7eqqlThlbQx9b
-
 import cv2
 import time
 import serial
