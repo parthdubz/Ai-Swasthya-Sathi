@@ -78,7 +78,7 @@ python app.py
 ## 🏆 Achievement:
 St. Xavier's SET Exhibition 30 — 1st Runner Up<br>
 Apprecaiton Letter from Ripumardini Sainik Mahavidyalaya <br>
-Apprecaiton Letter from Trinity College And SS
+Apprecaiton Letter from Trinity College And SS <br>
 Apprecaiton Letter from KIST College And SS
 <br>
 
