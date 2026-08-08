@@ -91,10 +91,7 @@ Microphone <br>
 WEB Camera <br>
 Buzzer <br>
 LED <br>
-### WORKING FLOWCHART :
-<div align="center">
-  <img height="400" src="https://i.ibb.co/Wv1mPsXx/93e3e43b-5d1f-4781-a0a8-98162c3b5638.png" alt="AI Alert System Flowchart" />
-</div>
+
 
 ---
 
