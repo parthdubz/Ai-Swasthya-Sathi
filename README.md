@@ -95,15 +95,15 @@ LED <br>
 ---
 
 ## NEW UPDATE AI V2
--> HOW OLD SYSTEM USED TO WORK:
-The user speaks into the microphone, and their voice is converted into text. Gemini creates a Nepali reply while a short "please wait" message plays. The reply has four parts: empathy, possible reason, simple self-care advice, and a closing message... without giving a diagnosis or medicine. In the background, the system saves the user's text, symptom label, and time in Supabase for tracking. Finally, the AI speaks the answer aloud and waits for the next input.
-i.e.
-User Voice → Speech-to-Text → Gemini AI Processing → Nepali Response Generation → Text-to-Speech
+-> HOW OLD SYSTEM USED TO WORK: <br>
+The user speaks into the microphone, and their voice is converted into text. Gemini creates a Nepali reply while a short "please wait" message plays. The reply has four parts: empathy, possible reason, simple self-care advice, and a closing message... without giving a diagnosis or medicine. In the background, the system saves the user's text, symptom label, and time in Supabase for tracking. Finally, the AI speaks the answer aloud and waits for the next input.<br>
+i.e.<br>
+User Voice → Speech-to-Text → Gemini AI Processing → Nepali Response Generation → Text-to-Speech<br>
 
--> NEW SYSTEM MECHANISM:
-This replaces the old turn-based flow (record -> Google STT -> generate_content -> Edge TTS with a continuous duplex stream, modeled on BaymaxLive from baymax.py on our another latest project. The mic streams in constantly, Gemini can respond while you're still talking, and audio streams back out in chunks instead of waiting for one full reply to render.
-i.e.
-Gemini Live duplex streaming (mic → Gemini → speaker) = Nepali healthcare AI responses
+-> NEW SYSTEM MECHANISM:<br>
+This replaces the old turn-based flow (record -> Google STT -> generate_content -> Edge TTS with a continuous duplex stream, modeled on BaymaxLive from baymax.py on our another latest project. The mic streams in constantly, Gemini can respond while you're still talking, and audio streams back out in chunks instead of waiting for one full reply to render.<br>
+i.e.<br>
+Gemini Live duplex streaming (mic → Gemini → speaker) = Nepali healthcare AI responses<br>
 
 
 ---
