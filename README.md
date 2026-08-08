@@ -115,7 +115,8 @@ https://github.com/user-attachments/assets/04df0eac-5f01-4ee1-b679-ee3503a69327
 ---
 
 ## 🌐 Connect with Us
-<div align="center"> <a href="https://instagram.com/parth_dubz"> <img src="https://img.shields.io/badge/Instagram-%23E4405F.svg?logo=Instagram&logoColor=white&style=for-the-badge" alt="Instagram"/> </a> <a href="https://linkedin.com/in/parthmahato"> <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=LinkedIn&logoColor=white&style=for-the-badge" alt="LinkedIn"/> </a> </div>
+<div align="center"> <a href="https://www.facebook.com/profile.php?id=61579786233519"> <img src="https://img.shields.io/badge/Facebook-%231877F2.svg?logo=Facebook&logoColor=white&style=for-the-badge"/> </a> 
+  <a href="https://www.linkedin.com/in/parth-mahato"> <img src="https://img.shields.io/badge/LinkedIn-%230077B5.svg?logo=LinkedIn&logoColor=white&style=for-the-badge" alt="LinkedIn"/> </a> </div>
 <br>
 
 ---
