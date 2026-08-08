@@ -1,3 +1,8 @@
+# Voice AI assistant (ai.py) — Gemini Live duplex audio + Supabase logging
+google-genai==0.3.0
+sounddevice==0.4.6
+supabase==2.3.4
+
 # Core AI & CV libraries
 opencv-python==4.8.1.78
 mediapipe==0.10.1
