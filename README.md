@@ -94,17 +94,54 @@ LED <br>
 
 ---
 
-## NEW UPDATE AI V2
--> HOW OLD SYSTEM USED TO WORK: <br>
-The user speaks into the microphone, and their voice is converted into text. Gemini creates a Nepali reply while a short "please wait" message plays. The reply has four parts: empathy, possible reason, simple self-care advice, and a closing message... without giving a diagnosis or medicine. In the background, the system saves the user's text, symptom label, and time in Supabase for tracking. Finally, the AI speaks the answer aloud and waits for the next input.<br>
-i.e.<br>
-User Voice → Speech-to-Text → Gemini AI Processing → Nepali Response Generation → Text-to-Speech<br>
+## NEW UPDATE: AI V2
 
--> NEW SYSTEM MECHANISM:<br>
-This replaces the old turn-based flow (record -> Google STT -> generate_content -> Edge TTS with a continuous duplex stream, modeled on BaymaxLive from baymax.py on our another latest project. The mic streams in constantly, Gemini can respond while you're still talking, and audio streams back out in chunks instead of waiting for one full reply to render.<br>
-i.e.<br>
-Gemini Live duplex streaming (mic → Gemini → speaker) = Nepali healthcare AI responses<br>
+### Previous System Architecture
 
+The previous version followed a sequential, turn-based workflow:
+
+1. The user spoke through the microphone.
+2. Speech was converted into text using Speech-to-Text.
+3. Gemini AI processed the input and generated a Nepali response.
+4. A short "please wait" message was played while processing.
+5. The response was structured into four sections:
+   - Empathy and acknowledgment
+   - Possible reasons for symptoms
+   - Simple self-care suggestions
+   - Closing guidance
+
+The system avoided providing direct diagnoses or prescribing medicines.
+
+In the background, user interactions were stored securely in Supabase, including:
+- User input text
+- Detected symptom category
+- Timestamp
+
+Finally, the generated response was converted into speech using Text-to-Speech, and the system waited for the next user input.
+
+**Old Pipeline:**
+
+`User Voice → Speech-to-Text → Gemini AI Processing → Nepali Response Generation → Text-to-Speech`
+
+### New System Architecture (AI V2)
+
+The new version replaces the traditional turn-based pipeline with a **continuous duplex streaming architecture**, inspired by the **BaymaxLive system** from our latest project.
+
+Instead of waiting for the complete user input and generating a response afterward:
+
+- The microphone continuously streams audio input.
+- Gemini processes the conversation in real time.
+- The AI can generate responses while the user is still speaking.
+- Audio output is streamed back in real-time chunks instead of waiting for a complete response.
+
+This creates a more natural, interactive healthcare conversation experience with lower latency and smoother communication.
+
+**New Pipeline:**
+
+`Gemini Live Duplex Streaming (Microphone → Gemini AI → Speaker)`
+
+**Result:**
+A real-time Nepali healthcare AI assistant capable of natural voice conversations, faster responses, and a more human-like interaction experience.
 
 ---
 
